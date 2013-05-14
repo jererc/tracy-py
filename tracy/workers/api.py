@@ -1,7 +1,6 @@
 from systools.system import webapp
 
 from tracy.apps import app
-
 from tracy import settings
 
 

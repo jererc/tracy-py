@@ -7,8 +7,9 @@ from systools.system import get_package_modules
 from tracy import settings, DbHandler, get_factory
 
 
-
 WORKERS_DIR = 'workers'
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def main():

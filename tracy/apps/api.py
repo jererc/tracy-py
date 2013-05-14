@@ -23,13 +23,13 @@ logger = logging.getLogger(__name__)
 def check_status():
     return jsonify(result='tracy')
 
-@app.route('/errors/list', methods=['GET'])
+@app.route('/error/list', methods=['GET'])
 @crossdomain(origin='*')
 def list_errors():
     items = [d for d in AggregatedLog.find(sort=[('end', DESCENDING)])]
     return serialize({'result': items})
 
-@app.route('/errors/remove', methods=['POST', 'OPTIONS'])
+@app.route('/error/remove', methods=['POST', 'OPTIONS'])
 @crossdomain(origin='*')
 def remove_errors():
     data = request.json
@@ -48,25 +48,25 @@ def remove_errors():
 
     return jsonify(result=True)
 
-@app.route('/tests/list', methods=['GET'])
+@app.route('/test/list', methods=['GET'])
 @crossdomain(origin='*')
 def list_tests():
     items = [d for d in Test.find(sort=[('created', ASCENDING)])]
     return serialize({'result': items})
 
-@app.route('/tests/info', methods=['GET'])
+@app.route('/test/info', methods=['GET'])
 @crossdomain(origin='*')
 def get_tests_info():
     info = TestInfo.find_one() or {}
     return serialize({'result': info})
 
-@app.route('/tests/reset', methods=['POST', 'OPTIONS'])
+@app.route('/test/reset', methods=['POST', 'OPTIONS'])
 @crossdomain(origin='*')
 def reset_tests():
     TestInfo.drop()
     return jsonify(result=True)
 
-@app.route('/logs/list', methods=['GET'])
+@app.route('/log/list', methods=['GET'])
 @crossdomain(origin='*')
 def list_logs():
     items = []
@@ -80,7 +80,7 @@ def list_logs():
 
     return serialize({'result': items})
 
-@app.route('/logs/get', methods=['POST', 'OPTIONS'])
+@app.route('/log/get', methods=['POST', 'OPTIONS'])
 @crossdomain(origin='*')
 def get_log():
     file = request.json.get('file')

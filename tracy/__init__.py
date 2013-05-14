@@ -4,7 +4,7 @@ import logging
 from factory import Factory
 
 from tracy import settings
-from tracy.utils.db import connect, Model
+from tracy.utils.db import Model, connect
 
 
 DEFAULT_SETTINGS = {
@@ -14,22 +14,8 @@ DEFAULT_SETTINGS = {
     'logs_line_pattern': r'^\d\d\d\d-\d\d-\d\d\b',
     }
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 connect(settings.DB_NAME)
-
-
-class Log(Model):
-    COL = 'logs'
-
-class AggregatedLog(Model):
-    COL = 'logs.aggregated'
-
-class Test(Model):
-    COL = 'tests'
-
-class TestInfo(Model):
-    COL = 'tests.info'
 
 
 class DbHandler(logging.Handler):
@@ -60,6 +46,22 @@ class DbHandler(logging.Handler):
             raise
         except:
             self.handleError(record)
+
+
+class Log(Model):
+    COL = 'logs'
+
+
+class AggregatedLog(Model):
+    COL = 'logs.aggregated'
+
+
+class Test(Model):
+    COL = 'tests'
+
+
+class TestInfo(Model):
+    COL = 'tests.info'
 
 
 class Settings(Model):
