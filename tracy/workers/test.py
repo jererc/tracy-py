@@ -39,7 +39,7 @@ def get_info(data):
     obj, traceback = data
     cls = obj.__class__
     return {
-        'name': str(obj),
+        'name': obj.id(),
         'file': inspect.getfile(cls).replace('.pyc', '.py'),
         'class': cls.__name__,
         'traceback': traceback,
