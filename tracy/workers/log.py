@@ -9,15 +9,22 @@ from tracy import Log, AggregatedLog
 logger = logging.getLogger(__name__)
 
 
-def aggregate():
+def aggregate_messages(messages):
+    res = []
+    for msg in messages:
+        item = (msg, messages.count(msg))
+        if item not in res:
+            res.append(item)
+
+    return sorted(res, key=itemgetter(1), reverse=True)
+
+def aggregate_logs():
     AggregatedLog.drop()
 
     for res in Log.find():
         doc = {
             'name': res['name'],
-            'funcName': res['funcName'],
-            'lineno': res['lineno'],
-            'pathname': res['pathname'],
+            'msg': res['msg'],
             }
         if AggregatedLog.find_one(doc):
             continue
@@ -27,26 +34,27 @@ def aggregate():
             'end': res['created'],
             'count': 0,
             }
-        msgs = {}
-        for res_ in Log.find(doc):
+
+        # Aggregate by message field
+        msgs = []
+        for log in Log.find(doc):
             to_update['count'] += 1
-            if res_['created'] < to_update['begin']:
-                to_update['begin'] = res_['created']
-            elif res_['created'] > to_update['end']:
-                to_update['end'] = res_['created']
+            if log['created'] < to_update['begin']:
+                to_update['begin'] = log['created']
+            elif log['created'] > to_update['end']:
+                to_update['end'] = log['created']
 
-            msg = res_['exc_text'] or res_['msg']
-            if res_['exc_text']:
+            if log['exc_text']:
                 to_update['exception'] = True
-            msgs.setdefault(msg, 0)
-            msgs[msg] += 1
 
-        to_update['msgs'] = sorted(msgs.items(),
-                key=itemgetter(1), reverse=True)
+            msgs.append({
+                    'message': log['exc_text'] or log['message'],
+                    'funcName': log['funcName'],
+                    'lineno': log['lineno'],
+                    'pathname': log['pathname'],
+                    })
 
-        for key, val in res.items():
-            if key not in ('created', 'exc_text', 'msg'):
-                doc[key] = val
+        to_update['msgs'] = aggregate_messages(msgs)
         doc.update(to_update)
 
         AggregatedLog.insert(doc, safe=True)
@@ -54,4 +62,4 @@ def aggregate():
 @loop(minutes=5)
 @timer()
 def run():
-    aggregate()
+    aggregate_logs()

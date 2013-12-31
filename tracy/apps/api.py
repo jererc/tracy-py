@@ -39,10 +39,10 @@ def remove_errors():
     id = ObjectId(data['id'])
     res = AggregatedLog.find_one({'_id': id})
     if res:
-        msgs = [m[0] for m in res['msgs']]
+        messages = [m[0]['message'] for m in res['msgs']]
         Log.remove({'$or': [
-                {'msg': {'$in': msgs}},
-                {'exc_text': {'$in': msgs}},
+                {'message': {'$in': messages}},
+                {'exc_text': {'$in': messages}},
                 ]})
         AggregatedLog.remove({'_id': id})
 

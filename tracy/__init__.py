@@ -20,28 +20,24 @@ connect(settings.DB_NAME)
 
 class DbHandler(logging.Handler):
 
-    def __init__(self, *args, **kwargs):
-        logging.Handler.__init__(self, *args, **kwargs)
-
     def _format_record(self, record):
-        if record.args:
-            record.msg = record.msg % record.args
+        record.message = record.msg % record.args if record.args else record.msg
         if record.exc_info:
             dummy = self.format(record)
             record.exc_info = None
 
         res = {}
         for key in ('created', 'exc_text', 'filename', 'funcName',
-                'levelname', 'levelno', 'lineno', 'message',
-                'module', 'msg', 'name', 'pathname', 'process'):
+                'levelname', 'levelno', 'lineno', 'message', 'module',
+                'msg', 'name', 'pathname', 'process', 'args'):
             res[key] = getattr(record, key, None)
         res['created'] = datetime.utcfromtimestamp(res['created'])
         return res
 
     def emit(self, record):
         try:
-            record_ = self._format_record(record)
-            Log.insert(record_, safe=True)
+            record = self._format_record(record)
+            Log.insert(record, safe=True)
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
