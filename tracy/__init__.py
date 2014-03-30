@@ -36,8 +36,8 @@ class DbHandler(logging.Handler):
 
     def emit(self, record):
         try:
-            record = self._format_record(record)
-            Log.insert(record, safe=True)
+            record_ = self._format_record(record)
+            Log.insert(record_, safe=True)
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
