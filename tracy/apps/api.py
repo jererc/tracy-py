@@ -36,15 +36,14 @@ def remove_errors():
     if not data.get('id'):
         return jsonify(error='missing id')
 
-    id = ObjectId(data['id'])
-    res = AggregatedLog.find_one({'_id': id})
+    id_ = ObjectId(data['id'])
+    res = AggregatedLog.find_one({'_id': id_})
     if res:
-        messages = [m[0]['message'] for m in res['msgs']]
-        Log.remove({'$or': [
-                {'message': {'$in': messages}},
-                {'exc_text': {'$in': messages}},
-                ]})
-        AggregatedLog.remove({'_id': id})
+        Log.remove({
+                'name': res['name'],
+                'msg': res['msg'],
+                })
+        AggregatedLog.remove({'_id': id_})
 
     return jsonify(result=True)
 
